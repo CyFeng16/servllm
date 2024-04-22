@@ -1,0 +1,35 @@
+x-commons: &default-settings
+#  volumes:
+#    - ${HOME}/.cache/huggingface:/root/.cache/huggingface
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - capabilities: ["gpu"]
+            driver: nvidia
+            count: ${GPU_COUNT:-all}
+
+services:
+  # no model weights in light image
+  light:
+    image: cyfeng/servllm:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      # model name is required for light image
+      - MODEL_NAME=Qwen/Qwen1.5-0.5B-Chat
+    <<: *default-settings
+
+  # full image with model weights
+  full:
+    image: cyfeng/servllm:qwen1.5-0.5b-chat
+    ports:
+      - "8000:8000"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - SERVELLM_MODEL_DTYPE=auto
+      - SERVELLM_MODEL_TP=1
+    <<: *default-settings
