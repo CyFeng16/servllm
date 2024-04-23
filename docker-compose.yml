@@ -11,25 +11,16 @@ x-commons: &default-settings
 
 services:
   # no model weights in light image
-  light:
-    image: cyfeng/servllm:latest
+  chatllm:
+    image: cyfeng/servllm:qwen1.5-4b-chat
+    shm_size: '16gb'
     ports:
       - "8000:8000"
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       # model name is required for light image
-      - MODEL_NAME=Qwen/Qwen1.5-0.5B-Chat
-    <<: *default-settings
-
-  # full image with model weights
-  full:
-    image: cyfeng/servllm:qwen1.5-0.5b-chat
-    ports:
-      - "8000:8000"
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      #- SERVELLM_MODEL_NAME=Qwen/Qwen1.5-4B-Chat
       - SERVELLM_MODEL_DTYPE=auto
       - SERVELLM_MODEL_TP=1
     <<: *default-settings

@@ -21,12 +21,12 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /root/.cache
 
 FROM with-cuda as with-vllm
-ARG SERVELLM_CUDA_VERSION
-#ARG SERVELLM_PYTHON_VERSION
+ARG SERVELLM_CUDA_VERSION=12.1
+ARG SERVELLM_PYTHON_VERSION=3.10
 ENV CUDA_HOME=/usr/local/cuda \
     PATH="${CUDA_HOME}/bin:${PATH}" \
     # Change this to the latest version of VLLM
-    VLLM_VERSION=0.4.0.post1 \
+    VLLM_VERSION=0.4.1 \
     PYTHON_VERSION_MAJOR_MINOR=${SERVELLM_PYTHON_VERSION//./} \
     CUDA_VERSION_MAJOR_MINOR=${SERVELLM_CUDA_VERSION//./} \
     SERVELLM_CUDA_VERSION=$SERVELLM_CUDA_VERSION
@@ -38,21 +38,28 @@ RUN if [ "$SERVELLM_CUDA_VERSION" = "12.1" ]; then \
     echo $VLLM_WHL_NAME && \
     pip install --no-cache https://github.com/vllm-project/vllm/releases/download/v${VLLM_VERSION}/${VLLM_WHL_NAME}  \
         --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION_MAJOR_MINOR} && \
-    git clone https://github.com/huggingface/transformers && \
-    cd transformers && \
-    pip install -e . && \
-    cd .. && \
+    pip install --no-cache-dir git+https://github.com/huggingface/transformers && \
     pip install --no-cache-dir flash-attn --no-build-isolation
 
-FROM with-vllm as with-model
+FROM docker.io/python:3.10-slim as with-model
 ARG SERVELLM_PRE_DOWNLOAD=false
+ARG SERVELLM_MODEL_NAME=Qwen/Qwen1.5-0.5B-Chat
+ENV SERVELLM_MODEL_NAME=$SERVELLM_MODEL_NAME
+WORKDIR /root/.cache/huggingface/
+RUN if [ "$SERVELLM_PRE_DOWNLOAD" = "true" ]; then \
+        pip install --no-cache-dir --upgrade huggingface_hub && \
+        # export HF_HUB_ENABLE_HF_TRANSFER=1 && \
+        export HF_ENDPOINT=https://hf-mirror.com && \
+        huggingface-cli download --resume-download $SERVELLM_MODEL_NAME ; \
+    fi
+
+FROM with-vllm as final
 ARG SERVELLM_MODEL_NAME=Qwen/Qwen1.5-0.5B-Chat
 ENV SERVELLM_MODEL_NAME=$SERVELLM_MODEL_NAME \
     SERVELLM_MODEL_DTYPE=auto \
-    SERVELLM_MODEL_TP=1
-RUN if [ "$SERVELLM_PRE_DOWNLOAD" = "true" ]; then \
-        pip install --no-cache-dir --upgrade "huggingface_hub[hf_transfer]" && \
-        export HF_HUB_ENABLE_HF_TRANSFER=1 && \
-        huggingface-cli download $SERVELLM_MODEL_NAME ; \
-    fi
-ENTRYPOINT ["/bin/bash", "-c", "python -m vllm.entrypoints.openai.api_server --model \"$SERVELLM_MODEL_NAME\" --dtype \"$SERVELLM_MODEL_DTYPE\" -tp \"$SERVELLM_MODEL_TP\""]
+    SERVELLM_MODEL_TP=1 \
+    GPU_MEMORY_UTILIZATION=0.9 \
+    MAX_MODEL_LEN=1024 \
+    PORT=8000
+COPY --from=with-model /root/.cache/huggingface/ /root/.cache/huggingface/
+ENTRYPOINT ["/bin/bash", "-c", "python -m vllm.entrypoints.openai.api_server --model \"$SERVELLM_MODEL_NAME\" --dtype \"$SERVELLM_MODEL_DTYPE\" -tp \"$SERVELLM_MODEL_TP\" --gpu-memory-utilization \"$GPU_MEMORY_UTILIZATION\" --max-model-len \"$MAX_MODEL_LEN\" --port \"$PORT\""]
