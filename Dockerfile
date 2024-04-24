@@ -48,8 +48,7 @@ ENV SERVELLM_MODEL_NAME=$SERVELLM_MODEL_NAME
 WORKDIR /root/.cache/huggingface/
 RUN if [ "$SERVELLM_PRE_DOWNLOAD" = "true" ]; then \
         pip install --no-cache-dir --upgrade huggingface_hub && \
-        # export HF_HUB_ENABLE_HF_TRANSFER=1 && \
-        export HF_ENDPOINT=https://hf-mirror.com && \
+        # export HF_ENDPOINT=https://hf-mirror.com && \
         huggingface-cli download --resume-download $SERVELLM_MODEL_NAME ; \
     fi
 

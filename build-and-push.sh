@@ -7,29 +7,7 @@ PYTHON_VERSIONS=("3.8" "3.9" "3.10" "3.11")
 PRE_DOWNLOADS=("false" "true")
 
 for PRE_DOWNLOAD in "${PRE_DOWNLOADS[@]}"; do
-  if [ "$PRE_DOWNLOAD" = "true" ]; then
-    for MODEL_NAME in "${MODEL_NAMES[@]}"; do
-      (
-        # set environment variables
-        SERVELLM_MODEL_NAME="${MODEL_NAME}"
-        SERVELLM_PRE_DOWNLOAD="${PRE_DOWNLOAD}"
-        SERVELLM_TAG=$(echo "$MODEL_NAME" | sed -e 's/.*\///' | tr '[:upper:]' '[:lower:]')
-        # export environment variables
-        export SERVELLM_MODEL_NAME
-        export SERVELLM_PRE_DOWNLOAD
-        export SERVELLM_TAG
-        # print environment variables
-        echo "***************"
-        echo "SERVELLM_MODEL_NAME: $SERVELLM_MODEL_NAME"
-        echo "SERVELLM_PRE_DOWNLOAD: $SERVELLM_PRE_DOWNLOAD"
-        echo "SERVELLM_TAG: $SERVELLM_TAG"
-        docker compose -f docker-compose.build.yml build
-        docker compose -f docker-compose.build.yml push
-        echo "***************"
-      ) &
-    done
-    wait
-  elif [ "$PRE_DOWNLOAD" = "false" ]; then
+  if [ "$PRE_DOWNLOAD" = "false" ]; then
     for PYTHON_VERSION in "${PYTHON_VERSIONS[@]}"; do
       for CUDA_VERSION in "${CUDA_VERSIONS[@]}"; do
         (
@@ -57,5 +35,27 @@ for PRE_DOWNLOAD in "${PRE_DOWNLOADS[@]}"; do
       done
       wait
     done
+  elif [ "$PRE_DOWNLOAD" = "true" ]; then
+    for MODEL_NAME in "${MODEL_NAMES[@]}"; do
+      (
+        # set environment variables
+        SERVELLM_MODEL_NAME="${MODEL_NAME}"
+        SERVELLM_PRE_DOWNLOAD="${PRE_DOWNLOAD}"
+        SERVELLM_TAG=$(echo "$MODEL_NAME" | sed -e 's/.*\///' | tr '[:upper:]' '[:lower:]')
+        # export environment variables
+        export SERVELLM_MODEL_NAME
+        export SERVELLM_PRE_DOWNLOAD
+        export SERVELLM_TAG
+        # print environment variables
+        echo "***************"
+        echo "SERVELLM_MODEL_NAME: $SERVELLM_MODEL_NAME"
+        echo "SERVELLM_PRE_DOWNLOAD: $SERVELLM_PRE_DOWNLOAD"
+        echo "SERVELLM_TAG: $SERVELLM_TAG"
+        docker compose -f docker-compose.build.yml build
+        docker compose -f docker-compose.build.yml push
+        echo "***************"
+      ) &
+    done
+    wait
   fi
 done
