@@ -1,5 +1,5 @@
 ARG SERVELLM_CUDA_VERSION=12.1
-FROM docker.io/nvidia/cuda:${SERVELLM_CUDA_VERSION}.0-devel-ubuntu22.04 as with-cuda
+FROM docker.io/nvidia/cuda:${SERVELLM_CUDA_VERSION}.0-devel-ubuntu22.04 AS with-cuda
 ARG SERVELLM_PYTHON_VERSION=3.10
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /workspace
@@ -20,13 +20,13 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /root/.cache
 
-FROM with-cuda as with-vllm
+FROM with-cuda AS with-vllm
 ARG SERVELLM_CUDA_VERSION=12.1
 ARG SERVELLM_PYTHON_VERSION=3.10
 ENV CUDA_HOME=/usr/local/cuda \
     PATH="${CUDA_HOME}/bin:${PATH}" \
     # Change this to the latest version of VLLM
-    VLLM_VERSION=0.4.2 \
+    VLLM_VERSION=0.5.2 \
     PYTHON_VERSION_MAJOR_MINOR=${SERVELLM_PYTHON_VERSION//./} \
     CUDA_VERSION_MAJOR_MINOR=${SERVELLM_CUDA_VERSION//./} \
     SERVELLM_CUDA_VERSION=$SERVELLM_CUDA_VERSION
@@ -41,7 +41,7 @@ RUN if [ "$SERVELLM_CUDA_VERSION" = "12.1" ]; then \
     pip install --no-cache-dir git+https://github.com/huggingface/transformers && \
     pip install --no-cache-dir flash-attn --no-build-isolation
 
-FROM docker.io/python:3.10-slim as with-model
+FROM docker.io/python:3.10-slim AS with-model
 ARG SERVELLM_PRE_DOWNLOAD=false
 ARG SERVELLM_MODEL_NAME=Qwen/Qwen1.5-0.5B-Chat
 ENV SERVELLM_MODEL_NAME=$SERVELLM_MODEL_NAME
@@ -52,7 +52,7 @@ RUN if [ "$SERVELLM_PRE_DOWNLOAD" = "true" ]; then \
         huggingface-cli download --resume-download $SERVELLM_MODEL_NAME ; \
     fi
 
-FROM with-vllm as final
+FROM with-vllm AS final
 ARG SERVELLM_MODEL_NAME=Qwen/Qwen1.5-0.5B-Chat
 ENV SERVELLM_MODEL_NAME=$SERVELLM_MODEL_NAME \
     SERVELLM_MODEL_DTYPE=auto \

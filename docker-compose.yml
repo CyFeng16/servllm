@@ -12,7 +12,7 @@ x-commons: &default-settings
 services:
   # no model weights in light image
   chatllm:
-    image: cyfeng/servllm:qwen1.5-4b-chat
+    image: cyfeng/servllm:qwen2-1.5b-instruct
     shm_size: '16gb'
     ports:
       - "8000:8000"

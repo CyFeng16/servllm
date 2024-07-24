@@ -1,15 +1,15 @@
 #!/bin/bash
 # docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
 
-CUDA_VERSIONS=("12.1" "11.8")
-MODEL_NAMES=("Qwen/Qwen1.5-0.5B-Chat" "Qwen/Qwen1.5-1.8B-Chat" "Qwen/Qwen1.5-4B-Chat" "Qwen/Qwen1.5-7B-Chat" "Qwen/Qwen1.5-14B-Chat" "Qwen/Qwen1.5-32B-Chat")
+CUDA_VERSIONS=("12.1")
+MODEL_NAMES=("Qwen/Qwen2-0.5B-Instruct Qwen/Qwen2-0.5B-Instruct-GPTQ-Int8 Qwen/Qwen2-0.5B-Instruct-GPTQ-Int4 Qwen/Qwen2-1.5B-Instruct Qwen/Qwen2-1.5B-Instruct-GPTQ-Int8 Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 Qwen/Qwen2-7B-Instruct Qwen/Qwen2-7B-Instruct-GPTQ-Int8 Qwen/Qwen2-7B-Instruct-GPTQ-Int4")
 PYTHON_VERSIONS=("3.8" "3.9" "3.10" "3.11")
-PRE_DOWNLOADS=("false" "true")
+PRE_DOWNLOADS=("true")
 
 for PRE_DOWNLOAD in "${PRE_DOWNLOADS[@]}"; do
   if [ "$PRE_DOWNLOAD" = "false" ]; then
-    for PYTHON_VERSION in "${PYTHON_VERSIONS[@]}"; do
-      for CUDA_VERSION in "${CUDA_VERSIONS[@]}"; do
+    for CUDA_VERSION in "${CUDA_VERSIONS[@]}"; do
+      for PYTHON_VERSION in "${PYTHON_VERSIONS[@]}"; do
         (
           # set environment variables
           SERVELLM_CUDA_VERSION="${CUDA_VERSION}"
