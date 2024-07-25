@@ -1,26 +1,40 @@
-x-commons: &default-settings
-#  volumes:
-#    - ${HOME}/.cache/huggingface:/root/.cache/huggingface
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - capabilities: ["gpu"]
-            driver: nvidia
-            count: ${GPU_COUNT:-all}
-
 services:
-  # no model weights in light image
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    network_mode: host
+    restart: always
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - 'OPENAI_API_BASE_URLS=http://localhost:8000/v1'
+      - 'OPENAI_API_KEY=vllm-1234567890abcdef'
+    depends_on:
+      - chatllm
+
   chatllm:
-    image: cyfeng/servllm:qwen2-1.5b-instruct
+    image: cyfeng/servllm:qwen2-7b-instruct-gptq-int8
     shm_size: '16gb'
-    ports:
-      - "8000:8000"
+    network_mode: host
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-      # model name is required for light image
-      #- SERVELLM_MODEL_NAME=Qwen/Qwen1.5-4B-Chat
+      - MAX_MODEL_LEN=14336
+      - GPU_MEMORY_UTILIZATION=0.95
       - SERVELLM_MODEL_DTYPE=auto
       - SERVELLM_MODEL_TP=1
-    <<: *default-settings
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
+              driver: nvidia
+              count: ${GPU_COUNT:-all}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/v1/models || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  open-webui:
