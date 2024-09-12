@@ -4,8 +4,5 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        SERVELLM_CUDA_VERSION: '${SERVELLM_CUDA_VERSION:-12.1}'
-        SERVELLM_MODEL_NAME: '${SERVELLM_MODEL_NAME:-Qwen/Qwen1.5-0.5B-Chat}'
-        SERVELLM_PYTHON_VERSION: '${SERVELLM_PYTHON_VERSION:-3.10}'
-        SERVELLM_PRE_DOWNLOAD: '${SERVELLM_PRE_DOWNLOAD:-false}'
+        SERVELLM_MODEL_NAME: '${SERVELLM_MODEL_NAME:-Qwen/Qwen2-0.5B-Instruct}'
     image: 'cyfeng/servllm:${SERVELLM_TAG}'
