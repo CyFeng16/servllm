@@ -3,7 +3,7 @@
 
 CUDA_VERSIONS=("12.1")
 MODEL_NAMES=("Qwen/Qwen2-0.5B-Instruct" "Qwen/Qwen2-0.5B-Instruct-GPTQ-Int8" "Qwen/Qwen2-0.5B-Instruct-GPTQ-Int4" "Qwen/Qwen2-1.5B-Instruct" "Qwen/Qwen2-1.5B-Instruct-GPTQ-Int8" "Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-7B-Instruct-GPTQ-Int8" "Qwen/Qwen2-7B-Instruct-GPTQ-Int4")
-PYTHON_VERSIONS=("3.8" "3.9" "3.10" "3.11")
+PYTHON_VERSIONS=("3.10" "3.11")
 PRE_DOWNLOADS=("true")
 
 for PRE_DOWNLOAD in "${PRE_DOWNLOADS[@]}"; do
