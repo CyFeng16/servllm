@@ -35,7 +35,7 @@ RUN pip install --no-cache-dir --upgrade huggingface_hub && \
     huggingface-cli download --resume-download $SERVELLM_MODEL_NAME
 
 FROM with-vllm AS final
-ARG SERVELLM_MODEL_NAME=Qwen/Qwen2-0.5B-Instruct
+ARG SERVELLM_MODEL_NAME=Qwen/Qwen2.5-0.5B-Instruct
 ENV SERVELLM_MODEL_NAME=$SERVELLM_MODEL_NAME \
     SERVELLM_MODEL_DTYPE=auto \
     SERVELLM_MODEL_TP=1 \

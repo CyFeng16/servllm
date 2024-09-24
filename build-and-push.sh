@@ -1,8 +1,7 @@
 #!/bin/bash
 # docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
 
-MODEL_NAMES=("Qwen/Qwen2-0.5B-Instruct")
-#MODEL_NAMES=("Qwen/Qwen2-0.5B-Instruct" "Qwen/Qwen2-0.5B-Instruct-GPTQ-Int8" "Qwen/Qwen2-0.5B-Instruct-GPTQ-Int4" "Qwen/Qwen2-1.5B-Instruct" "Qwen/Qwen2-1.5B-Instruct-GPTQ-Int8" "Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-7B-Instruct-GPTQ-Int8" "Qwen/Qwen2-7B-Instruct-GPTQ-Int4")
+MODEL_NAMES=("Qwen/Qwen2.5-0.5B-Instruct" "Qwen/Qwen2.5-1.5B-Instruct" "Qwen/Qwen2.5-3B-Instruct" "Qwen/Qwen2.5-7B-Instruct" "Qwen/Qwen2.5-0.5B-Instruct-GPTQ-Int8" "Qwen/Qwen2.5-1.5B-Instruct-GPTQ-Int8" "Qwen/Qwen2.5-3B-Instruct-GPTQ-Int8" "Qwen/Qwen2.5-7B-Instruct-GPTQ-Int8")
 
 # 定义一个标记来检查任务是否失败
 FAILED=0

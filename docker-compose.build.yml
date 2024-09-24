@@ -4,5 +4,5 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        SERVELLM_MODEL_NAME: '${SERVELLM_MODEL_NAME:-Qwen/Qwen2-0.5B-Instruct}'
+        SERVELLM_MODEL_NAME: '${SERVELLM_MODEL_NAME:-Qwen/Qwen2.5-0.5B-Instruct}'
     image: 'cyfeng/servllm:${SERVELLM_TAG}'
